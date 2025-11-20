@@ -1,0 +1,1 @@
+2025-11-15T01:15:13+00:00 ERROR Failed to handle the log: Class "Automattic\WooCommerce\Database\Migrations\CustomOrderTable\PostToOrderTableMigrator" not found
