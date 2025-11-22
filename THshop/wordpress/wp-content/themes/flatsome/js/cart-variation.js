@@ -23,3 +23,25 @@ jQuery(document).ready(function($){
         });
     });
 });
+
+jQuery(document).on('change', '.cart-variation-select', function(){
+    var $this = jQuery(this);
+    jQuery.ajax({
+        url: cart_variation_params.ajax_url,
+        method: 'POST',
+        data: {
+            action: 'update_cart_variation',
+            cart_item_key: $this.data('cart_item_key'),
+            attribute_name: $this.attr('name'),
+            value: $this.val()
+        },
+        success: function(res){
+            if(res.success){
+                // Refresh cart fragments để totals, coupon, quantity được update
+                jQuery(document.body).trigger('wc_fragment_refresh');
+            } else {
+                alert(res.data);
+            }
+        }
+    });
+});

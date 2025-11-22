@@ -20,41 +20,41 @@ flatsome()->init();
 
 
 
-# HIỂN THỊ MÃ ƯU ĐÃI
-add_action( 'woocommerce_before_cart', function() {
+// Hiển thị Smart Coupons dưới tiêu đề "Mã ưu đãi" trên trang giỏ hàng
+add_action('woocommerce_before_cart', function() {
     ?>
     <script type="text/javascript">
     jQuery(document).ready(function($){
-        var $couponDiv = $('.coupon'); // div chứa "Mã ưu đãi"
+        var $couponDiv = $('.checkout_coupon .coupon');
 
-        // Chèn coupon nhưng chỉ nếu chưa có class 'inserted'
         function insertCoupons() {
             $('.wt_sc_single_coupon').each(function(){
-                if (!$(this).hasClass('inserted')) {
-                    $(this).insertAfter($couponDiv.find('h3.widget-title'));
-                    $(this).addClass('inserted'); // đánh dấu đã chèn
+                // Kiểm tra đã có bản clone chèn chưa
+                var code = $(this).data('code');
+                if ($couponDiv.find('.wt_sc_single_coupon.inserted[data-code="' + code + '"]').length === 0) {
+                    // Clone coupon và gán class 'inserted' để tránh trùng
+                    $(this).clone().addClass('inserted').insertAfter($couponDiv.find('h3.widget-title').first());
                 }
             });
         }
 
-        // Chạy ngay khi load page
+        // Chèn ngay khi load page
         insertCoupons();
 
-        // Quan sát các node mới được thêm vào DOM
+        // Quan sát DOM nếu có coupon mới được render qua Ajax
         var observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                $(mutation.addedNodes).find('.wt_sc_single_coupon').each(function(){
-                    insertCoupons();
-                });
-            });
+            insertCoupons();
         });
-
         observer.observe(document.body, { childList: true, subtree: true });
+
+        // Chạy lại khi giỏ hàng cập nhật
+        $(document.body).on('updated_cart_totals', function() {
+            insertCoupons();
+        });
     });
     </script>
     <?php
 });
-
 
 
 
@@ -187,3 +187,4 @@ function custom_remove_duplicate_variation($item_data, $cart_item){
     }
     return array_values($unique);
 }
+
